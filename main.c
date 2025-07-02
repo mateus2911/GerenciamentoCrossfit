@@ -56,7 +56,7 @@ int main() {
         }
 
         switch (opcao) {
-            case 1: cadastrar_aluno(); break;
+            case 1: cadastrar_aluno(); ordenar_base_alunos(); break;
             case 2: listar_alunos(); break;
             case 3: 
                 printf("Digite o ID do aluno: ");
