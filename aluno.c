@@ -1,45 +1,112 @@
+
+//Camille Silva Oliveira 23.1.8120
+
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include "aluno.h"
+#include "utils.h"
 
-void inicializar_bd_aluno(Aluno bd[], int *tamanho) {
-    *tamanho = 0;
+int obter_total_alunos() {
+    FILE *file = fopen(ARQUIVO_ALUNOS, "rb");
+    if (file == NULL) return 0;
+    fseek(file, 0, SEEK_END);
+    int total = ftell(file) / sizeof(Aluno);
+    fclose(file);
+    return total;
 }
 
-void adicionar_aluno(Aluno bd[], int *tamanho, int id, const char *nome, const char *nivel, const char historico[][MAX_ENTRADA_HISTORICO], int contador_hist) {
-    if (*tamanho < MAX_ALUNOS && contador_hist <= MAX_HISTORICO) {
-        bd[*tamanho].id_aluno = id;
-        strncpy(bd[*tamanho].nome, nome, MAX_NOME - 1);
-        bd[*tamanho].nome[MAX_NOME - 1] = '\0';
-        strncpy(bd[*tamanho].nivel_experiencia, nivel, MAX_NIVEL - 1);
-        bd[*tamanho].nivel_experiencia[MAX_NIVEL - 1] = '\0';
-        bd[*tamanho].contador_historico = contador_hist;
-        for (int i = 0; i < contador_hist; i++) {
-            strncpy(bd[*tamanho].historico_treinos[i], historico[i], MAX_ENTRADA_HISTORICO - 1);
-            bd[*tamanho].historico_treinos[i][MAX_ENTRADA_HISTORICO - 1] = '\0';
+// Implementa estrutura para Aluno e cria base de dados desordenada.
+void cadastrar_aluno() {
+    FILE *file = fopen(ARQUIVO_ALUNOS, "ab");
+    if (file == NULL) {
+        perror("Erro ao abrir o arquivo de alunos");
+        return;
+    }
+
+    Aluno novo_aluno;
+    novo_aluno.id = obter_total_alunos();
+    novo_aluno.ativo = 1;
+
+    printf("Digite o nome do aluno: ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", novo_aluno.nome);
+
+    printf("Digite o nível do aluno (fitness, scale, rx): ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", novo_aluno.nivel);
+
+    fwrite(&novo_aluno, sizeof(Aluno), 1, file);
+    fclose(file);
+    printf("\nAluno com ID %d cadastrado com sucesso!\n", novo_aluno.id);
+}
+
+// Implementa busca sequencial.
+Aluno buscar_aluno_sequencial(int id) {
+    FILE *file = fopen(ARQUIVO_ALUNOS, "rb");
+    Aluno aluno;
+    aluno.id = -1;
+
+    if (file == NULL) return aluno;
+
+    while (fread(&aluno, sizeof(Aluno), 1, file)) {
+        if (aluno.id == id && aluno.ativo) {
+            fclose(file);
+            return aluno;
         }
-        (*tamanho)++;
     }
+    fclose(file);
+    aluno.id = -1;
+    return aluno;
 }
 
-void exibir_bd_aluno(Aluno bd[], int tamanho) {
-    printf("\nBanco de Dados de Alunos:\n");
-    for (int i = 0; i < tamanho; i++) {
-        printf("ID: %d, Nome: %s, Nível: %s, Histórico: ", bd[i].id_aluno, bd[i].nome, bd[i].nivel_experiencia);
-        for (int j = 0; j < bd[i].contador_historico; j++) {
-            printf("%s ", bd[i].historico_treinos[j]);
+// Implementa busca binária.
+Aluno buscar_aluno_binaria(int id) {
+    FILE *file = fopen(ARQUIVO_ALUNOS, "rb");
+    Aluno aluno;
+    aluno.id = -1;
+
+    if (file == NULL) return aluno;
+
+    int inicio = 0;
+    int fim = obter_total_alunos() - 1;
+
+    while (inicio <= fim) {
+        int meio = inicio + (fim - inicio) / 2;
+        fseek(file, meio * sizeof(Aluno), SEEK_SET);
+        fread(&aluno, sizeof(Aluno), 1, file);
+
+        if (aluno.id == id && aluno.ativo) {
+            fclose(file);
+            return aluno;
         }
-        printf("\n");
+        if (aluno.id < id) {
+            inicio = meio + 1;
+        } else {
+            fim = meio - 1;
+        }
     }
+    fclose(file);
+    aluno.id = -1;
+    return aluno;
 }
 
-void registrar_progresso_aluno(Aluno *aluno, int id_treino, const char *desempenho) {
-    if (aluno->contador_historico < MAX_HISTORICO) {
-        char entrada[MAX_ENTRADA_HISTORICO];
-        snprintf(entrada, MAX_ENTRADA_HISTORICO, "Treino_%d: %s", id_treino, desempenho);
-        strncpy(aluno->historico_treinos[aluno->contador_historico], entrada, MAX_ENTRADA_HISTORICO - 1);
-        aluno->historico_treinos[aluno->contador_historico][MAX_ENTRADA_HISTORICO - 1] = '\0';
-        aluno->contador_historico++;
+void listar_alunos() {
+    FILE *file = fopen(ARQUIVO_ALUNOS, "rb");
+    if (file == NULL) {
+        printf("\nNenhum aluno cadastrado.\n");
+        return;
     }
+
+    Aluno aluno;
+    printf("\n--- Lista de Alunos ---\n");
+    printf("%-5s | %-30s | %-15s\n", "ID", "Nome", "Nível");
+    printf("-----------------------------------------------------\n");
+    while (fread(&aluno, sizeof(Aluno), 1, file)) {
+        if (aluno.ativo) {
+            printf("%-5d | %-30s | %-15s\n", aluno.id, aluno.nome, aluno.nivel);
+        }
+    }
+    printf("-----------------------------------------------------\n");
+    fclose(file);
 }

@@ -1,25 +1,66 @@
+
+//Camille Silva Oliveira 23.1.8120
+
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include "crossfit.h"
+#include "utils.h"
 
-void inicializar_bd_crossfit(CrossFit bd[], int *tamanho) {
-    *tamanho = 0;
+/**
+ * @brief Permite cadastrar ou atualizar os dados da unidade central CrossFit.
+ * A função sempre trabalha com o primeiro (e único) registro do arquivo.
+ */
+void gerenciar_unidade_crossfit() {
+    CrossFit unidade;
+
+    printf("\n--- Gerenciar Dados da Unidade CrossFit ---\n");
+    
+    unidade.id = 0; // ID fixo para a unidade central
+
+    printf("Digite o nome da academia: ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", unidade.nome);
+    
+    printf("Digite o endereço da academia: ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", unidade.endereco);
+
+    // Abre o arquivo em modo "wb" para sempre sobrescrever ou criar o arquivo.
+    // Isso garante que haverá apenas um registro de unidade.
+    FILE *file = fopen(ARQUIVO_CROSSFIT, "wb");
+    if (file == NULL) {
+        perror("Erro ao abrir o arquivo da unidade CrossFit");
+        return;
+    }
+
+    fwrite(&unidade, sizeof(CrossFit), 1, file);
+    fclose(file);
+
+    printf("\nDados da unidade CrossFit salvos com sucesso!\n");
 }
 
-void adicionar_crossfit(CrossFit bd[], int *tamanho, int id, const char *nome, const char *endereco) {
-    if (*tamanho < MAX_CROSSFIT) {
-        bd[*tamanho].id_crossfit = id;
-        strncpy(bd[*tamanho].nome, nome, MAX_NOME - 1);
-        bd[*tamanho].nome[MAX_NOME - 1] = '\0';
-        strncpy(bd[*tamanho].endereco, endereco, MAX_ENDERECO - 1);
-        bd[*tamanho].endereco[MAX_ENDERECO - 1] = '\0';
-        (*tamanho)++;
-    }
-}
+/**
+ * @brief Exibe os dados da unidade CrossFit cadastrada.
+ */
+void exibir_dados_unidade() {
+    CrossFit unidade;
 
-void exibir_bd_crossfit(CrossFit bd[], int tamanho) {
-    printf("Banco de Dados CrossFit:\n");
-    for (int i = 0; i < tamanho; i++) {
-        printf("ID: %d, Nome: %s, Endereço: %s\n", bd[i].id_crossfit, bd[i].nome, bd[i].endereco);
+    FILE *file = fopen(ARQUIVO_CROSSFIT, "rb");
+    if (file == NULL) {
+        printf("\nNenhuma unidade CrossFit cadastrada ainda.\n");
+        printf("Use a opção de gerenciamento para cadastrar a unidade.\n");
+        return;
     }
+
+    // Lê o primeiro (e único) registro do arquivo.
+    if (fread(&unidade, sizeof(CrossFit), 1, file) != 1) {
+        printf("\nNão foi possível ler os dados da unidade. O arquivo pode estar vazio ou corrompido.\n");
+    } else {
+        printf("\n--- Dados da Unidade CrossFit ---\n");
+        printf("Nome: %s\n", unidade.nome);
+        printf("Endereço: %s\n", unidade.endereco);
+        printf("----------------------------------\n");
+    }
+    
+    fclose(file);
 }

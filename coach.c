@@ -1,63 +1,103 @@
+
+//Camille Silva Oliveira 23.1.8120
+
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include "coach.h"
+#include "utils.h"
 
-void inicializar_bd_coach(Coach bd[], int *tamanho) {
-    *tamanho = 0;
+/**
+ * @brief Calcula o número total de registros de coaches no arquivo.
+ * @return O número total de coaches cadastrados.
+ */
+int obter_total_coaches() {
+    FILE *file = fopen(ARQUIVO_COACHES, "rb");
+    if (file == NULL) {
+        return 0; // Se o arquivo não existe, não há coaches.
+    }
+    fseek(file, 0, SEEK_END);
+    int total = ftell(file) / sizeof(Coach);
+    fclose(file);
+    return total;
 }
 
-void adicionar_coach(Coach bd[], int *tamanho, int id, const char *nome, const char *especialidade, const char disponibilidade[][MAX_HORARIO], int contador_disp) {
-    if (*tamanho < MAX_COACHES && contador_disp <= MAX_DISPONIBILIDADE) {
-        bd[*tamanho].id_coach = id;
-        strncpy(bd[*tamanho].nome, nome, MAX_NOME - 1);
-        bd[*tamanho].nome[MAX_NOME - 1] = '\0';
-        strncpy(bd[*tamanho].especialidade, especialidade, MAX_ESPECIALIDADE - 1);
-        bd[*tamanho].especialidade[MAX_ESPECIALIDADE - 1] = '\0';
-        bd[*tamanho].contador_disponibilidade = contador_disp;
-        for (int i = 0; i < contador_disp; i++) {
-            strncpy(bd[*tamanho].disponibilidade[i], disponibilidade[i], MAX_HORARIO - 1);
-            bd[*tamanho].disponibilidade[i][MAX_HORARIO - 1] = '\0';
-        }
-        (*tamanho)++;
+/**
+ * @brief Cadastra um novo coach na base de dados.
+ * A função solicita o nome e a especialidade e salva o novo registro no final do arquivo `coaches.bin`.
+ * [cite_start]Os atributos são baseados na definição da entidade Coach. [cite: 10]
+ */
+void cadastrar_coach() {
+    FILE *file = fopen(ARQUIVO_COACHES, "ab");
+    if (file == NULL) {
+        perror("Erro ao abrir o arquivo de coaches");
+        return;
     }
+
+    Coach novo_coach;
+    novo_coach.id = obter_total_coaches(); // ID único sequencial
+    novo_coach.ativo = 1;
+
+    printf("Digite o nome do coach: ");
+    limpar_buffer_entrada(); // Limpa o buffer antes de ler a string
+    scanf("%[^\n]", novo_coach.nome);
+
+    printf("Digite a especialidade do coach (ex: força, LPO, ginástica): ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", novo_coach.especialidade);
+
+    fwrite(&novo_coach, sizeof(Coach), 1, file);
+    fclose(file);
+    printf("\nCoach com ID %d cadastrado com sucesso!\n", novo_coach.id);
 }
 
-void exibir_bd_coach(Coach bd[], int tamanho) {
-    printf("\nBanco de Dados de Coaches:\n");
-    for (int i = 0; i < tamanho; i++) {
-        printf("ID: %d, Nome: %s, Especialidade: %s, Disponibilidade: ", bd[i].id_coach, bd[i].nome, bd[i].especialidade);
-        for (int j = 0; j < bd[i].contador_disponibilidade; j++) {
-            printf("%s ", bd[i].disponibilidade[j]);
-        }
-        printf("\n");
+/**
+ * @brief Busca um coach pelo seu ID usando uma varredura sequencial no arquivo.
+ * @param id O ID do coach a ser procurado.
+ * @return Retorna a struct Coach se encontrado, ou uma struct com id = -1 se não encontrado.
+ */
+Coach buscar_coach_sequencial(int id) {
+    FILE *file = fopen(ARQUIVO_COACHES, "rb");
+    Coach coach;
+    coach.id = -1; // Valor padrão para "não encontrado"
+
+    if (file == NULL) {
+        return coach; // Retorna "não encontrado" se o arquivo não puder ser aberto
     }
+
+    // Lê o arquivo registro por registro
+    while (fread(&coach, sizeof(Coach), 1, file)) {
+        if (coach.id == id && coach.ativo) {
+            fclose(file);
+            return coach; // Retorna o coach encontrado
+        }
+    }
+
+    fclose(file);
+    coach.id = -1; // Garante que o ID é -1 se o loop terminar sem encontrar
+    return coach;
 }
 
-int coach_esta_disponivel(Coach *coach, const char *data_hora) {
-    for (int i = 0; i < coach->contador_disponibilidade; i++) {
-        if (strcmp(coach->disponibilidade[i], data_hora) == 0) {
-            return 1;
-        }
+/**
+ * @brief Lista todos os coaches ativos cadastrados na base de dados.
+ */
+void listar_coaches() {
+    FILE *file = fopen(ARQUIVO_COACHES, "rb");
+    if (file == NULL) {
+        printf("\nNenhum coach cadastrado.\n");
+        return;
     }
-    return 0;
-}
 
-void atualizar_disponibilidade_coach(Coach *coach, const char *data_hora, int remover) {
-    if (remover) {
-        for (int i = 0; i < coach->contador_disponibilidade; i++) {
-            if (strcmp(coach->disponibilidade[i], data_hora) == 0) {
-                for (int j = i; j < coach->contador_disponibilidade - 1; j++) {
-                    strcpy(coach->disponibilidade[j], coach->disponibilidade[j + 1]);
-                }
-                coach->contador_disponibilidade--;
-                break;
-            }
-        }
-    } else {
-        if (coach->contador_disponibilidade < MAX_DISPONIBILIDADE) {
-            strcpy(coach->disponibilidade[coach->contador_disponibilidade], data_hora);
-            coach->contador_disponibilidade++;
+    Coach coach;
+    printf("\n--- Lista de Coaches ---\n");
+    printf("%-5s | %-30s | %-20s\n", "ID", "Nome", "Especialidade");
+    printf("-------------------------------------------------------------\n");
+    
+    while (fread(&coach, sizeof(Coach), 1, file)) {
+        if (coach.ativo) {
+            printf("%-5d | %-30s | %-20s\n", coach.id, coach.nome, coach.especialidade);
         }
     }
+    printf("-------------------------------------------------------------\n");
+    fclose(file);
 }

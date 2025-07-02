@@ -1,102 +1,154 @@
+
+//Camille Silva Oliveira 23.1.8120
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "treino.h"
-#include "coach.h"
 #include "aluno.h"
-#include "buscabinaria.h"
+#include "coach.h" // Incluir o cabeçalho do coach
+#include "utils.h"
 
-void inicializar_bd_treino(TreinoDiario bd[], int *tamanho) {
-    *tamanho = 0;
+int obter_total_treinos() {
+    FILE *file = fopen(ARQUIVO_TREINOS, "rb");
+    if (file == NULL) return 0;
+    fseek(file, 0, SEEK_END);
+    int total = ftell(file) / sizeof(Treino);
+    fclose(file);
+    return total;
 }
 
-void exibir_bd_treino(TreinoDiario bd[], int tamanho) {
-    printf("\nBanco de Dados de Treinos:\n");
-    for (int i = 0; i < tamanho; i++) {
-        printf("ID: %d, Data: %s, Tipo: %s, ID Coach: %d, Alunos: ", bd[i].id, bd[i].data, bd[i].tipo_treino, bd[i].id_coach);
-        for (int j = 0; j < bd[i].contador_alunos; j++) {
-            printf("%d ", bd[i].alunos_inscritos[j]);
-        }
-        printf("\n");
-    }
-}
+// Operação que exemplifica a interação entre Coach e Treino.
+// Corresponde à operação de "Planejamento de treinos".
+void agendar_treino() {
+    int id_coach;
+    printf("Digite o ID do coach responsável: ");
+    scanf("%d", &id_coach);
 
-void planejar_treino(TreinoDiario bd_treino[], int *tamanho_treino, int id, const char *data, const char *tipo_treino, Coach bd_coach[], int tamanho_coach, int novos_alunos[], int num_novos_alunos, int max_alunos) {
-    if (*tamanho_treino >= MAX_TREINOS) {
-        printf("Não é possível adicionar mais treinos.\n");
+    Coach c = buscar_coach_sequencial(id_coach);
+    if (c.id == -1) {
+        printf("\nErro: Coach com ID %d não encontrado.\n", id_coach);
         return;
     }
 
-    int id_coach_atribuido = -1;
-    for (int i = 0; i < tamanho_coach; i++) {
-        if (strcmp(bd_coach[i].especialidade, tipo_treino) == 0 && coach_esta_disponivel(&bd_coach[i], data)) {
-            id_coach_atribuido = bd_coach[i].id_coach;
-            atualizar_disponibilidade_coach(&bd_coach[i], data, 1);
+    Treino novo_treino;
+    novo_treino.id_coach_responsavel = id_coach;
+    novo_treino.id = obter_total_treinos();
+    novo_treino.num_inscritos = 0;
+
+    printf("Digite a data do treino (DD/MM/AAAA): ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", novo_treino.data);
+
+    printf("Digite o tipo do treino (ex: WOD): ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", novo_treino.tipo_treino);
+
+    FILE *file = fopen(ARQUIVO_TREINOS, "ab");
+    if(file == NULL) { perror("Erro ao abrir arquivo"); return; }
+    fwrite(&novo_treino, sizeof(Treino), 1, file);
+    fclose(file);
+
+    printf("\nTreino agendado com sucesso para o coach %s!\n", c.nome);
+}
+
+// Operação que exemplifica a interação entre Aluno e Treino.
+void inscrever_aluno_em_treino() {
+    int id_aluno, id_treino;
+
+    printf("Digite o ID do treino: ");
+    scanf("%d", &id_treino);
+    printf("Digite o ID do aluno a ser inscrito: ");
+    scanf("%d", &id_aluno);
+
+    Aluno a = buscar_aluno_sequencial(id_aluno);
+    if (a.id == -1) {
+        printf("\nErro: Aluno com ID %d não encontrado.\n", id_aluno);
+        return;
+    }
+
+    FILE *file = fopen(ARQUIVO_TREINOS, "r+b");
+    if (file == NULL) {
+        printf("\nNenhum treino cadastrado.\n");
+        return;
+    }
+
+    Treino treino;
+    int encontrado = 0;
+    long pos_arquivo = 0;
+
+    while (fread(&treino, sizeof(Treino), 1, file)) {
+        if (treino.id == id_treino) {
+            encontrado = 1;
+            pos_arquivo = ftell(file) - sizeof(Treino);
             break;
         }
     }
 
-    if (id_coach_atribuido == -1) {
-        printf("Nenhum coach disponível para %s na data %s.\n", tipo_treino, data);
+    if (!encontrado) {
+        printf("\nErro: Treino com ID %d não encontrado.\n", id_treino);
+        fclose(file);
         return;
     }
 
-    TreinoDiario *novo_treino = &bd_treino[*tamanho_treino];
-    novo_treino->id = id;
-    strncpy(novo_treino->data, data, sizeof(novo_treino->data) - 1);
-    novo_treino->data[sizeof(novo_treino->data) - 1] = '\0';
-    strncpy(novo_treino->tipo_treino, tipo_treino, MAX_TIPO_TREINO - 1);
-    novo_treino->tipo_treino[MAX_TIPO_TREINO - 1] = '\0';
-    novo_treino->id_coach = id_coach_atribuido;
-    novo_treino->contador_alunos = 0;
-
-    for (int i = 0; i < num_novos_alunos && novo_treino->contador_alunos < max_alunos; i++) {
-        novo_treino->alunos_inscritos[novo_treino->contador_alunos++] = novos_alunos[i];
+    if (treino.num_inscritos >= MAX_ALUNOS_TREINO) {
+        printf("\nErro: O treino já atingiu o limite de vagas.\n");
+        fclose(file);
+        return;
     }
 
-    (*tamanho_treino)++;
-    printf("Treino de %s planejado para %s com o Coach ID %d.\n", tipo_treino, data, id_coach_atribuido);
+    for (int i = 0; i < treino.num_inscritos; i++) {
+        if (treino.lista_alunos_inscritos[i] == id_aluno) {
+            printf("\nErro: Aluno já está inscrito neste treino.\n");
+            fclose(file);
+            return;
+        }
+    }
+
+    treino.lista_alunos_inscritos[treino.num_inscritos] = id_aluno;
+    treino.num_inscritos++;
+
+    fseek(file, pos_arquivo, SEEK_SET);
+    fwrite(&treino, sizeof(Treino), 1, file);
+    fclose(file);
+
+    printf("\nAluno %s inscrito com sucesso no treino %d!\n", a.nome, id_treino);
 }
 
-void buscar_treinos_por_data_e_tipo(TreinoDiario bd_treino[], int tamanho_treino, Coach bd_coach[], int tamanho_coach, Aluno bd_aluno[], int tamanho_aluno, const char *data, const char *tipo) {
-     printf("Buscando treinos para data (prefixo): %s e tipo: %s\n", data, tipo);
-    for (int i = 0; i < tamanho_treino; i++) {
-        if (strncmp(bd_treino[i].data, data, strlen(data)) == 0 && strcmp(bd_treino[i].tipo_treino, tipo) == 0) {
-            Coach *c = busca_sequencial_coach(bd_coach, tamanho_coach, bd_treino[i].id_coach);
-            printf("\nTreino ID: %d, Data: %s, Tipo: %s, Coach: %s\n", bd_treino[i].id, bd_treino[i].data, bd_treino[i].tipo_treino, c ? c->nome : "N/A");
-            printf("Alunos Inscritos:\n");
-            for (int j = 0; j < bd_treino[i].contador_alunos; j++) {
-                Aluno *a = busca_sequencial_aluno(bd_aluno, tamanho_aluno, bd_treino[i].alunos_inscritos[j]);
-                printf(" - %s (ID: %d)\n", a ? a->nome : "N/A", bd_treino[i].alunos_inscritos[j]);
-            }
-        }
+void listar_treinos() {
+    FILE *file = fopen(ARQUIVO_TREINOS, "rb");
+    if (file == NULL) {
+        printf("\nNenhum treino agendado.\n");
+        return;
     }
+
+    Treino treino;
+    printf("\n--- Lista de Treinos Agendados ---\n");
+    while (fread(&treino, sizeof(Treino), 1, file)) {
+        Coach c = buscar_coach_sequencial(treino.id_coach_responsavel);
+        printf("ID: %d | Data: %s | Tipo: %s | Coach: %s | Vagas: %d/%d\n",
+               treino.id, treino.data, treino.tipo_treino,
+               (c.id != -1 ? c.nome : "N/A"),
+               treino.num_inscritos, MAX_ALUNOS_TREINO);
+    }
+    printf("----------------------------------\n");
+    fclose(file);
 }
 
+Treino buscar_treino_sequencial(int id) {
+    FILE *file = fopen(ARQUIVO_TREINOS, "rb");
+    Treino treino;
+    treino.id = -1;
 
-void realocar_coach(TreinoDiario *treino, Coach bd_coach[], int tamanho_coach, const char *data_hora, const char *especialidade) {
-    if (!treino) return;
+    if (file == NULL) return treino;
 
-    Coach *coach_antigo = busca_sequencial_coach(bd_coach, tamanho_coach, treino->id_coach);
-    if (coach_antigo) {
-        atualizar_disponibilidade_coach(coach_antigo, data_hora, 0); 
-    }
-
-    int novo_id_coach = -1;
-    for (int i = 0; i < tamanho_coach; i++) {
-        if (bd_coach[i].id_coach != treino->id_coach && strcmp(bd_coach[i].especialidade, especialidade) == 0 && coach_esta_disponivel(&bd_coach[i], data_hora)) {
-            novo_id_coach = bd_coach[i].id_coach;
-            atualizar_disponibilidade_coach(&bd_coach[i], data_hora, 1);
-            break;
+    while (fread(&treino, sizeof(Treino), 1, file)) {
+        if (treino.id == id) {
+            fclose(file);
+            return treino;
         }
     }
-
-    if (novo_id_coach != -1) {
-        printf("Coach %s (ID: %d) realocado para Coach (ID: %d) para o treino ID %d.\n", coach_antigo ? coach_antigo->nome : "N/A", treino->id_coach, novo_id_coach, treino->id);
-        treino->id_coach = novo_id_coach;
-    } else {
-        printf("Não foi possível realocar um novo coach para o treino ID %d.\n", treino->id);
-         if (coach_antigo) {
-            atualizar_disponibilidade_coach(coach_antigo, data_hora, 1);
-        }
-    }
+    fclose(file);
+    treino.id = -1;
+    return treino;
 }
