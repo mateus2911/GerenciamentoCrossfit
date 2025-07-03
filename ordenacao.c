@@ -16,14 +16,14 @@ void ordenar_base_alunos() {
     // Abre o arquivo para leitura e escrita ("r+b")
     FILE *file = fopen(ARQUIVO_ALUNOS, "r+b");
     if (file == NULL) {
-        perror("Não foi possível abrir o arquivo para ordenação");
+        perror("Não foi possível abrir o arquivo para ordenacao");
         return;
     }
 
     Aluno aluno_i, aluno_j, min_aluno;
     int i, j, min_idx;
 
-    printf("\nIniciando ordenação da base de alunos em disco (Selection Sort)...\n");
+    printf("\nIniciando ordenacao da base de alunos em disco (Selection Sort)\n");
 
     for (i = 0; i < total_alunos - 1; i++) {
         // Assume que o elemento atual é o mínimo

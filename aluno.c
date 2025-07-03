@@ -34,7 +34,7 @@ void cadastrar_aluno() {
     limpar_buffer_entrada();
     scanf("%[^\n]", novo_aluno.nome);
 
-    printf("Digite o nível do aluno (fitness, scale, rx): ");
+    printf("Digite o nivel do aluno (fitness, scale, rx): ");
     limpar_buffer_entrada();
     scanf("%[^\n]", novo_aluno.nivel);
 
@@ -87,7 +87,7 @@ Aluno buscar_aluno_binaria(int id) {
         if (aluno.id == id && aluno.ativo) {
             QueryPerformanceCounter(&end);
             double tempo_binario = ((double)(end.QuadPart - start.QuadPart)) / frequency.QuadPart;
-            printf("Tempo da busca binária: %f segundos.\n", tempo_binario);
+            printf("Tempo da busca binaria: %f segundos.\n", tempo_binario);
             fclose(file);
             return aluno;
         }

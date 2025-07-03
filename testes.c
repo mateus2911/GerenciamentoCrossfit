@@ -37,7 +37,7 @@ void gerar_alunos_aleatorios(int quantidade) {
     // 1. Cria um array em memória com todos os IDs em ordem sequencial.
     int *ids = malloc(quantidade * sizeof(int));
     if (ids == NULL) {
-        perror("Erro de alocação de memória para IDs");
+        perror("Erro de alocacao de memoria para IDs");
         fclose(file);
         return;
     }
@@ -68,9 +68,9 @@ void gerar_alunos_aleatorios(int quantidade) {
         fwrite(&aluno, sizeof(Aluno), 1, file);
     }
 
-    free(ids); // Libera a memória do array de IDs
+    free(ids); // Libera a memoria do array de IDs
     fclose(file);
-    printf("Concluído.\n");
+    printf("Concluido.\n");
 }
 
 void gerar_coaches_aleatorios(int quantidade) {

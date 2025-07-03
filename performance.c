@@ -21,13 +21,13 @@ void registrar_performance_aluno() {
 
     Aluno aluno = buscar_aluno_sequencial(id_aluno);
     if (aluno.id == -1) {
-        printf("\nErro: Aluno com ID %d não foi encontrado.\n", id_aluno);
+        printf("\nErro: Aluno com ID %d nao foi encontrado.\n", id_aluno);
         return;
     }
 
     Treino treino = buscar_treino_sequencial(id_treino);
     if (treino.id == -1) {
-        printf("\nErro: Treino com ID %d não foi encontrado.\n", id_treino);
+        printf("\nErro: Treino com ID %d nao foi encontrado.\n", id_treino);
         return;
     }
 
@@ -39,7 +39,7 @@ void registrar_performance_aluno() {
         }
     }
     if (!aluno_inscrito) {
-        printf("\nErro: O aluno %s não está inscrito no treino %d.\n", aluno.nome, id_treino);
+        printf("\nErro: O aluno %s nao esta inscrito no treino %d.\n", aluno.nome, id_treino);
         return;
     }
 
@@ -60,15 +60,15 @@ void registrar_performance_aluno() {
 void consultar_historico_aluno(int id_aluno) {
     Aluno aluno = buscar_aluno_sequencial(id_aluno);
     if (aluno.id == -1) {
-        printf("\nErro: Aluno com ID %d não foi encontrado.\n", id_aluno);
+        printf("\nErro: Aluno com ID %d nao foi encontrado.\n", id_aluno);
         return;
     }
 
-    printf("\n--- Histórico de Treinos de %s ---\n", aluno.nome);
+    printf("\n--- Historico de Treinos de %s ---\n", aluno.nome);
 
     FILE* file = fopen(ARQUIVO_PERFORMANCE, "rb");
     if (file == NULL) {
-        printf("Nenhum histórico de performance encontrado.\n");
+        printf("Nenhum historico de performance encontrado.\n");
         return;
     }
 

@@ -42,7 +42,7 @@ void cadastrar_coach() {
     limpar_buffer_entrada(); // Limpa o buffer antes de ler a string
     scanf("%[^\n]", novo_coach.nome);
 
-    printf("Digite a especialidade do coach (ex: força, LPO, ginástica): ");
+    printf("Digite a especialidade do coach (ex: forca, LPO, ginastica): ");
     limpar_buffer_entrada();
     scanf("%[^\n]", novo_coach.especialidade);
 

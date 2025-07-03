@@ -21,7 +21,7 @@ void gerenciar_unidade_crossfit() {
     limpar_buffer_entrada();
     scanf("%[^\n]", unidade.nome);
     
-    printf("Digite o endereço da academia: ");
+    printf("Digite o endereco da academia: ");
     limpar_buffer_entrada();
     scanf("%[^\n]", unidade.endereco);
 
@@ -48,17 +48,17 @@ void exibir_dados_unidade() {
     FILE *file = fopen(ARQUIVO_CROSSFIT, "rb");
     if (file == NULL) {
         printf("\nNenhuma unidade CrossFit cadastrada ainda.\n");
-        printf("Use a opção de gerenciamento para cadastrar a unidade.\n");
+        printf("Use a opcao de gerenciamento para cadastrar a unidade.\n");
         return;
     }
 
     // Lê o primeiro (e único) registro do arquivo.
     if (fread(&unidade, sizeof(CrossFit), 1, file) != 1) {
-        printf("\nNão foi possível ler os dados da unidade. O arquivo pode estar vazio ou corrompido.\n");
+        printf("\nNao foi possível ler os dados da unidade. O arquivo pode estar vazio ou corrompido.\n");
     } else {
         printf("\n--- Dados da Unidade CrossFit ---\n");
         printf("Nome: %s\n", unidade.nome);
-        printf("Endereço: %s\n", unidade.endereco);
+        printf("Endereco: %s\n", unidade.endereco);
         printf("----------------------------------\n");
     }
     

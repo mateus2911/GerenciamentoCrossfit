@@ -22,12 +22,12 @@ int obter_total_treinos() {
 // Corresponde à operação de "Planejamento de treinos".
 void agendar_treino() {
     int id_coach;
-    printf("Digite o ID do coach responsável: ");
+    printf("Digite o ID do coach responsavel: ");
     scanf("%d", &id_coach);
 
     Coach c = buscar_coach_sequencial(id_coach);
     if (c.id == -1) {
-        printf("\nErro: Coach com ID %d não encontrado.\n", id_coach);
+        printf("\nErro: Coach com ID %d nao encontrado.\n", id_coach);
         return;
     }
 
@@ -63,7 +63,7 @@ void inscrever_aluno_em_treino() {
 
     Aluno a = buscar_aluno_sequencial(id_aluno);
     if (a.id == -1) {
-        printf("\nErro: Aluno com ID %d não encontrado.\n", id_aluno);
+        printf("\nErro: Aluno com ID %d nao encontrado.\n", id_aluno);
         return;
     }
 
@@ -86,20 +86,20 @@ void inscrever_aluno_em_treino() {
     }
 
     if (!encontrado) {
-        printf("\nErro: Treino com ID %d não encontrado.\n", id_treino);
+        printf("\nErro: Treino com ID %d nao encontrado.\n", id_treino);
         fclose(file);
         return;
     }
 
     if (treino.num_inscritos >= MAX_ALUNOS_TREINO) {
-        printf("\nErro: O treino já atingiu o limite de vagas.\n");
+        printf("\nErro: O treino ja atingiu o limite de vagas.\n");
         fclose(file);
         return;
     }
 
     for (int i = 0; i < treino.num_inscritos; i++) {
         if (treino.lista_alunos_inscritos[i] == id_aluno) {
-            printf("\nErro: Aluno já está inscrito neste treino.\n");
+            printf("\nErro: Aluno ja esta inscrito neste treino.\n");
             fclose(file);
             return;
         }

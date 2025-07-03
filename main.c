@@ -23,14 +23,14 @@ void exibir_menu() {
     printf("1. Cadastrar Aluno\n");
     printf("2. Listar Alunos\n");
     printf("3. Buscar Aluno (Sequencial)\n");
-    printf("4. Buscar Aluno (Binária)\n");
+    printf("4. Buscar Aluno (Binaria)\n");
     printf("5. Cadastrar Coach\n");
     printf("6. Listar Coaches\n");
     printf("7. Agendar Treino\n");
     printf("8. Inscrever Aluno em Treino\n");
     printf("9. Listar Treinos\n");
     printf("10. Registrar Performance\n");
-    printf("11. Consultar Histórico de Aluno\n");
+    printf("11. Consultar Historico de Aluno\n");
     printf("12. Gerenciar Unidade CrossFit\n");
     printf("13. Exibir Dados da Unidade\n");
     printf("0. Sair\n");
@@ -50,7 +50,7 @@ int main() {
     do {
         exibir_menu();
         if (scanf("%d", &opcao) != 1) {
-            printf("\nEntrada inválida. Por favor, digite um número.\n");
+            printf("\nEntrada invalida. Por favor, digite um numero.\n");
             limpar_buffer_entrada();
             continue;
         }
@@ -71,14 +71,14 @@ int main() {
                 scanf("%d", &id_busca);
                 aluno_resultado = buscar_aluno_sequencial(id_busca);
                 if (aluno_resultado.id != -1) printf("Aluno encontrado: %s\n", aluno_resultado.nome);
-                else printf("Aluno não encontrado.\n");
+                else printf("Aluno nao encontrado.\n");
                 break;
             case 4: 
                 printf("Digite o ID do aluno: ");
                 scanf("%d", &id_busca);
                 aluno_resultado = buscar_aluno_binaria(id_busca);
                 if (aluno_resultado.id != -1) printf("Aluno encontrado: %s\n", aluno_resultado.nome);
-                else printf("Aluno não encontrado.\n");
+                else printf("Aluno nao encontrado.\n");
                 break;
             case 5: cadastrar_coach(); break;
             case 6: listar_coaches(); break;
@@ -94,7 +94,7 @@ int main() {
             case 12: gerenciar_unidade_crossfit(); break;
             case 13: exibir_dados_unidade(); break;
             case 0: printf("Saindo do sistema...\n"); break;
-            default: printf("Opção inválida! Tente novamente.\n"); break;
+            default: printf("Opcao invalida! Tente novamente.\n"); break;
         }
     } while (opcao != 0);
 
