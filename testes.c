@@ -124,4 +124,3 @@ void gerar_treinos_aleatorios(int quantidade, int total_alunos, int total_coache
     }
     fclose(file);
 }
-

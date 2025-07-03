@@ -3,7 +3,7 @@
 
 #ifndef ENTIDADES_H
 #define ENTIDADES_H
-
+#define ARQUIVO_NOTIFICACOES "notificacoes.bin"
 #include <stdio.h>
 
 // --- Constantes de tamanho ---
@@ -22,23 +22,13 @@
 #define ARQUIVO_TREINOS "treinos.bin"
 #define ARQUIVO_PERFORMANCE "performance.bin"
 
-// --- Estruturas de Entidades ---
-
-/**
- * @brief Representa a academia como unidade central.
- * @param id Identificador único da unidade.
- * @param nome Nome da academia de CrossFit.
- * @param endereco Endereço físico da academia.
- */
 typedef struct {
     int id;
     char nome[MAX_NOME];
     char endereco[MAX_ENDERECO];
 } CrossFit;
 
-/**
- * @brief Representa os frequentadores da academia que participam dos treinos.
- */
+
 typedef struct {
     int id;
     char nome[MAX_NOME];
@@ -46,9 +36,7 @@ typedef struct {
     int ativo;
 } Aluno;
 
-/**
- * @brief Representa os profissionais responsáveis por conduzir os treinos.
- */
+
 typedef struct {
     int id;
     char nome[MAX_NOME];
@@ -56,9 +44,7 @@ typedef struct {
     int ativo;
 } Coach;
 
-/**
- * @brief Representa os planos de treino diários.
- */
+
 typedef struct {
     int id;
     char data[11]; // Formato DD/MM/AAAA
@@ -68,13 +54,18 @@ typedef struct {
     int num_inscritos;
 } Treino;
 
-/**
- * @brief Representa um registro de desempenho para acompanhamento de progresso.
- */
+
 typedef struct {
     int id_aluno;
     int id_treino;
     char resultado[MAX_RESULTADO];
 } Performance;
+
+typedef struct {
+    int id_destinatario;
+    int tipo_destinatario; // 1: Aluno, 2: Coach
+    char mensagem[200];
+    int lida;
+} Notificacao;
 
 #endif // ENTIDADES_H

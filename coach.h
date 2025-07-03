@@ -9,6 +9,8 @@
 // Protótipos das funções de gerenciamento de coaches
 void cadastrar_coach();
 Coach buscar_coach_sequencial(int id);
+Coach buscar_coach_binaria(int id);
 void listar_coaches();
+int obter_total_coaches();
 
 #endif // COACH_H

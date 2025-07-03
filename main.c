@@ -8,6 +8,7 @@
 #include "ordenacao.h"
 #include "crossfit.h"
 #include "utils.h"
+#include "notificacao.h"
 #include "testes.h"
 
 void inicializar_arquivos() {
@@ -16,6 +17,7 @@ void inicializar_arquivos() {
     FILE *fc = fopen(ARQUIVO_COACHES, "ab"); if(fc) fclose(fc);
     FILE *ft = fopen(ARQUIVO_TREINOS, "ab"); if(ft) fclose(ft);
     FILE *fp = fopen(ARQUIVO_PERFORMANCE, "ab"); if(fp) fclose(fp);
+    FILE *fn = fopen(ARQUIVO_NOTIFICACOES, "ab"); if(fn) fclose(fn);
 }
 
 void exibir_menu() {
@@ -33,6 +35,8 @@ void exibir_menu() {
     printf("11. Consultar Historico de Aluno\n");
     printf("12. Gerenciar Unidade CrossFit\n");
     printf("13. Exibir Dados da Unidade\n");
+    printf("14. Gerar Notificacoes\n");
+    printf("15. Exibir Minhas Notificacoes\n");
     printf("0. Sair\n");
     printf("\nEscolha uma opcao: ");
 }
@@ -44,7 +48,7 @@ int main() {
     int opcao;
     int id_busca; // Declarada aqui para ser usada em múltiplos cases
     Aluno aluno_resultado; // Variável reutilizável para buscas
-
+    int id_usuario, tipo_usuario;
     inicializar_arquivos();
 
     do {
@@ -93,6 +97,18 @@ int main() {
                 break;
             case 12: gerenciar_unidade_crossfit(); break;
             case 13: exibir_dados_unidade(); break;
+            case 14: verificar_e_gerar_notificacoes();break;
+            case 15:
+                printf("Voce e (1) Aluno ou (2) Coach? ");
+                scanf("%d", &tipo_usuario);
+                printf("Digite seu ID: ");
+                scanf("%d", &id_usuario);
+                if (tipo_usuario == 1 || tipo_usuario == 2) {
+                    exibir_notificacoes_pendentes(id_usuario, tipo_usuario);
+                } else {
+                    printf("Tipo de usuario invalido.\n");
+                }
+                break;
             case 0: printf("Saindo do sistema...\n"); break;
             default: printf("Opcao invalida! Tente novamente.\n"); break;
         }

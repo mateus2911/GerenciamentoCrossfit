@@ -5,5 +5,6 @@
 #define ORDENACAO_H
 
 void ordenar_base_alunos();
+void ordenar_base_coaches();
 
 #endif // ORDENACAO_H
