@@ -9,14 +9,44 @@
 #include "aluno.h"
 #include "coach.h"
 #include "treino.h"
-#include "ordenacao.h" // Necessário para chamar a função de ordenar
+#include "ordenacao.h"
 
+// Função auxiliar para embaralhar um array de inteiros (algoritmo Fisher-Yates)
+void embaralhar_ids(int *array, int n) {
+    if (n > 1) {
+        for (int i = n - 1; i > 0; i--) {
+            // Escolhe um índice aleatório de 0 a i
+            int j = rand() % (i + 1);
+            // Troca o elemento de i com o elemento do índice aleatório j
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+}
+
+// Função modificada para gerar uma base de dados de alunos genuinamente DESORDENADA por ID.
 void gerar_alunos_aleatorios(int quantidade) {
-    FILE *file = fopen(ARQUIVO_ALUNOS, "wb"); // "wb" para criar um arquivo novo para o teste
+    // "wb" cria um arquivo novo, apagando qualquer um que já exista.
+    FILE *file = fopen(ARQUIVO_ALUNOS, "wb");
     if (file == NULL) {
         perror("Falha ao criar arquivo de alunos para teste");
         return;
     }
+
+    // 1. Cria um array em memória com todos os IDs em ordem sequencial.
+    int *ids = malloc(quantidade * sizeof(int));
+    if (ids == NULL) {
+        perror("Erro de alocação de memória para IDs");
+        fclose(file);
+        return;
+    }
+    for (int i = 0; i < quantidade; i++) {
+        ids[i] = i;
+    }
+
+    // 2. Embaralha o array de IDs.
+    embaralhar_ids(ids, quantidade);
 
     const char* nomes[] = {"Ana", "Bruno", "Carlos", "Daniela", "Eduardo", "Fernanda", "Gabriel", "Helena", "Igor", "Julia"};
     const char* sobrenomes[] = {"Silva", "Souza", "Oliveira", "Pereira", "Costa", "Rodrigues", "Martins", "Almeida", "Barros", "Ribeiro"};
@@ -26,17 +56,19 @@ void gerar_alunos_aleatorios(int quantidade) {
     int num_sobrenomes = sizeof(sobrenomes) / sizeof(char*);
     int num_niveis = sizeof(niveis) / sizeof(char*);
 
-    printf("Gerando %d registros de alunos aleatórios... ", quantidade);
+    printf("Gerando %d registros de alunos de forma desordenada... ", quantidade);
 
+    // 3. Escreve os alunos no arquivo usando os IDs embaralhados.
     for (int i = 0; i < quantidade; i++) {
         Aluno aluno;
-        aluno.id = i;
+        aluno.id = ids[i]; // Pega o ID da lista embaralhada
         aluno.ativo = 1;
         sprintf(aluno.nome, "%s %s", nomes[rand() % num_nomes], sobrenomes[rand() % num_sobrenomes]);
         strcpy(aluno.nivel, niveis[rand() % num_niveis]);
         fwrite(&aluno, sizeof(Aluno), 1, file);
     }
 
+    free(ids); // Libera a memória do array de IDs
     fclose(file);
     printf("Concluído.\n");
 }
@@ -93,74 +125,3 @@ void gerar_treinos_aleatorios(int quantidade, int total_alunos, int total_coache
     fclose(file);
 }
 
-void executar_suite_de_testes() {
-    int qtd_registros;
-    printf("\n--- Suíte de Testes de Desempenho ---\n");
-    printf("Digite a quantidade de registros de alunos a serem gerados para o teste: ");
-    scanf("%d", &qtd_registros);
-
-    if (qtd_registros <= 0) {
-        printf("Quantidade inválida.\n");
-        return;
-    }
-
-    // Seed para números aleatórios
-    srand(time(NULL));
-
-    // 1. GERAÇÃO DE DADOS
-    gerar_alunos_aleatorios(qtd_registros);
-    // Gerar outros dados se necessário para testes mais complexos
-    // gerar_coaches_aleatorios(qtd_registros / 100 + 1);
-    // gerar_treinos_aleatorios(qtd_registros / 10, qtd_registros, qtd_registros / 100 + 1);
-
-    // 2. TESTE DE BUSCA SEQUENCIAL (em arquivo desordenado)
-    printf("\n--- Testando Busca Sequencial ---\n");
-    int id_busca = rand() % qtd_registros; // Escolhe um ID aleatório para buscar
-    printf("Buscando pelo ID aleatório: %d\n", id_busca);
-
-    clock_t inicio = clock();
-    Aluno aluno_encontrado_seq = buscar_aluno_sequencial(id_busca);
-    clock_t fim = clock();
-    double tempo_sequencial = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-    
-    if (aluno_encontrado_seq.id != -1) {
-        printf("Aluno '%s' encontrado.\n", aluno_encontrado_seq.nome);
-    } else {
-        printf("Aluno com ID %d não encontrado.\n", id_busca);
-    }
-    printf("Tempo da busca sequencial: %f segundos.\n", tempo_sequencial);
-
-    // 3. TESTE DE ORDENAÇÃO
-    printf("\n--- Testando Ordenação em Disco ---\n");
-    inicio = clock();
-    ordenar_base_alunos();
-    fim = clock();
-    double tempo_ordenacao = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-    printf("Tempo para ordenar a base de dados: %f segundos.\n", tempo_ordenacao);
-
-    // 4. TESTE DE BUSCA BINÁRIA (em arquivo ordenado)
-    printf("\n--- Testando Busca Binária ---\n");
-    printf("Buscando pelo mesmo ID: %d\n", id_busca);
-    
-    inicio = clock();
-    Aluno aluno_encontrado_bin = buscar_aluno_binaria(id_busca);
-    fim = clock();
-    double tempo_binaria = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
-
-    if (aluno_encontrado_bin.id != -1) {
-        printf("Aluno '%s' encontrado.\n", aluno_encontrado_bin.nome);
-    } else {
-        printf("Aluno com ID %d não encontrado.\n", id_busca);
-    }
-    printf("Tempo da busca binária: %f segundos.\n", tempo_binaria);
-
-    // 5. COMPARAÇÃO
-    printf("\n--- Comparativo de Desempenho ---\n");
-    printf("Busca Sequencial: %f s\n", tempo_sequencial);
-    printf("Busca Binária:    %f s\n", tempo_binaria);
-    if(tempo_binaria > 0) {
-        printf("A busca binária foi aproximadamente %.2fx mais rápida que a sequencial (desconsiderando o tempo de ordenação).\n", tempo_sequencial / tempo_binaria);
-    }
-    printf("Custo da ordenação: %f s\n", tempo_ordenacao);
-    printf("----------------------------------\n");
-}

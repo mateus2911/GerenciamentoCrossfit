@@ -11,6 +11,5 @@ void gerar_coaches_aleatorios(int quantidade);
 
 void gerar_treinos_aleatorios(int quantidade, int total_alunos, int total_coaches);
 
-void executar_suite_de_testes();
 
 #endif // TESTES_H

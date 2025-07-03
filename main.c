@@ -33,14 +33,14 @@ void exibir_menu() {
     printf("11. Consultar Histórico de Aluno\n");
     printf("12. Gerenciar Unidade CrossFit\n");
     printf("13. Exibir Dados da Unidade\n");
-    printf("14. Executar Suíte de Testes de Desempenho\n");
     printf("0. Sair\n");
     printf("\nEscolha uma opcao: ");
 }
 
+
 int main() {
     setlocale(LC_ALL, "Portuguese_Brazil.1252"); // Corrige caracteres especiais
-
+    int quantidade_alunos = 0;
     int opcao;
     int id_busca; // Declarada aqui para ser usada em múltiplos cases
     Aluno aluno_resultado; // Variável reutilizável para buscas
@@ -56,7 +56,15 @@ int main() {
         }
 
         switch (opcao) {
-            case 1: cadastrar_aluno(); ordenar_base_alunos(); break;
+            case 1: 
+            printf("Quantos alunos deseja criar(para fins de teste)? ");
+            scanf("%d", &quantidade_alunos);
+            gerar_alunos_aleatorios(quantidade_alunos);
+            listar_alunos();
+            printf("\nBase de alunos desordenada criada com %d registros.\n", quantidade_alunos);
+            ordenar_base_alunos(); 
+            printf("Base de alunos ordenada com sucesso.\n");
+            break;
             case 2: listar_alunos(); break;
             case 3: 
                 printf("Digite o ID do aluno: ");
@@ -85,7 +93,6 @@ int main() {
                 break;
             case 12: gerenciar_unidade_crossfit(); break;
             case 13: exibir_dados_unidade(); break;
-            case 14: executar_suite_de_testes(); break;
             case 0: printf("Saindo do sistema...\n"); break;
             default: printf("Opção inválida! Tente novamente.\n"); break;
         }
