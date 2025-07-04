@@ -100,3 +100,35 @@ void listar_coaches() {
     printf("-------------------------------------------------------------\n");
     fclose(file);
 }
+
+void consultar_coaches_por_carga_horaria() {
+    FILE *f_coaches = fopen(ARQUIVO_COACHES, "rb");
+    if (f_coaches == NULL) {
+        printf("\nNenhum coach cadastrado.\n");
+        return;
+    }
+
+    printf("\n--- Carga Horaria de Coaches (baseado nos treinos agendados) ---\n");
+    printf("%-5s | %-30s | %-10s\n", "ID", "Nome", "Treinos");
+    printf("-----------------------------------------------------------\n");
+
+    Coach coach;
+    while (fread(&coach, sizeof(Coach), 1, f_coaches)) {
+        if (coach.ativo) {
+            FILE *f_treinos = fopen(ARQUIVO_TREINOS, "rb");
+            if (f_treinos == NULL) continue;
+
+            Treino t;
+            int contagem_treinos = 0;
+            while (fread(&t, sizeof(Treino), 1, f_treinos)) {
+                if (t.id_coach_responsavel == coach.id) {
+                    contagem_treinos++;
+                }
+            }
+            printf("%-5d | %-30s | %-10d\n", coach.id, coach.nome, contagem_treinos);
+            fclose(f_treinos);
+        }
+    }
+    printf("-----------------------------------------------------------\n");
+    fclose(f_coaches);
+}

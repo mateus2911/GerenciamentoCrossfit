@@ -12,5 +12,6 @@ Coach buscar_coach_sequencial(int id);
 Coach buscar_coach_binaria(int id);
 void listar_coaches();
 int obter_total_coaches();
+void consultar_coaches_por_carga_horaria();
 
 #endif // COACH_H

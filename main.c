@@ -41,6 +41,40 @@ void exibir_menu() {
     printf("\nEscolha uma opcao: ");
 }
 
+void exibir_menu_busca_avancada() {
+    printf("\n--- Busca Avancada ---\n");
+    printf("1. Consultar treinos por tipo\n");
+    printf("2. Consultar treinos por data\n");
+    printf("3. Consultar alunos por nivel\n");
+    printf("4. Consultar alunos por frequencia\n");
+    printf("5. Consultar coaches por carga horaria\n");
+    printf("0. Voltar ao menu principal\n");
+    printf("\nEscolha uma opcao: ");
+}
+
+void menu_busca_avancada() {
+    int opcao;
+    do {
+        exibir_menu_busca_avancada();
+        if (scanf("%d", &opcao) != 1) {
+            printf("\nEntrada invalida. Por favor, digite um numero.\n");
+            limpar_buffer_entrada();
+            continue;
+        }
+
+        switch (opcao) {
+            case 1: consultar_treinos_por_tipo(); break;
+            case 2: consultar_treinos_por_data(); break;
+            case 3: consultar_alunos_por_nivel(); break;
+            case 4: consultar_alunos_por_frequencia(); break;
+            case 5: consultar_coaches_por_carga_horaria(); break;
+            case 0: break; // Volta ao menu principal
+            default: printf("Opcao invalida! Tente novamente.\n"); break;
+        }
+    } while (opcao != 0);
+}
+
+
 
 int main() {
     setlocale(LC_ALL, "Portuguese_Brazil.1252"); // Corrige caracteres especiais
@@ -111,6 +145,7 @@ int main() {
                     printf("Tipo de usuario invalido.\n");
                 }
                 break;
+            case 16: menu_busca_avancada(); break; // Adiciona o menu de busca avançada
             case 0: printf("Saindo do sistema...\n"); break;
             default: printf("Opcao invalida! Tente novamente.\n"); break;
         }

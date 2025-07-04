@@ -152,3 +152,70 @@ Treino buscar_treino_sequencial(int id) {
     treino.id = -1;
     return treino;
 }
+
+void consultar_treinos_por_tipo() {
+    char tipo_busca[MAX_TIPO_TREINO];
+    printf("\nDigite o tipo do treino a ser buscado (ex: WOD): ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", tipo_busca);
+
+    FILE *file = fopen(ARQUIVO_TREINOS, "rb");
+    if (file == NULL) {
+        printf("\nNenhum treino cadastrado.\n");
+        return;
+    }
+
+    Treino treino;
+    int encontrados = 0;
+    printf("\n--- Treinos encontrados para o tipo '%s' ---\n", tipo_busca);
+    while (fread(&treino, sizeof(Treino), 1, file)) {
+        if (strcmp(treino.tipo_treino, tipo_busca) == 0) {
+            Coach c = buscar_coach_sequencial(treino.id_coach_responsavel);
+            printf("ID: %d | Data: %s | Tipo: %s | Coach: %s | Vagas: %d/%d\n",
+                   treino.id, treino.data, treino.tipo_treino,
+                   (c.id != -1 ? c.nome : "N/A"),
+                   treino.num_inscritos, MAX_ALUNOS_TREINO);
+            encontrados++;
+        }
+    }
+
+    if (encontrados == 0) {
+        printf("Nenhum treino encontrado com o tipo especificado.\n");
+    }
+    printf("--------------------------------------------------\n");
+    fclose(file);
+}
+
+
+void consultar_treinos_por_data() {
+    char data_busca[11];
+    printf("\nDigite a data do treino a ser buscado (DD/MM/AAAA): ");
+    limpar_buffer_entrada();
+    scanf("%[^\n]", data_busca);
+
+    FILE *file = fopen(ARQUIVO_TREINOS, "rb");
+    if (file == NULL) {
+        printf("\nNenhum treino cadastrado.\n");
+        return;
+    }
+
+    Treino treino;
+    int encontrados = 0;
+    printf("\n--- Treinos encontrados para a data '%s' ---\n", data_busca);
+    while (fread(&treino, sizeof(Treino), 1, file)) {
+        if (strcmp(treino.data, data_busca) == 0) {
+            Coach c = buscar_coach_sequencial(treino.id_coach_responsavel);
+            printf("ID: %d | Data: %s | Tipo: %s | Coach: %s | Vagas: %d/%d\n",
+                   treino.id, treino.data, treino.tipo_treino,
+                   (c.id != -1 ? c.nome : "N/A"),
+                   treino.num_inscritos, MAX_ALUNOS_TREINO);
+            encontrados++;
+        }
+    }
+
+    if (encontrados == 0) {
+        printf("Nenhum treino encontrado na data especificada.\n");
+    }
+    printf("--------------------------------------------------\n");
+    fclose(file);
+}
