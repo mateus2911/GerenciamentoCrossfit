@@ -37,6 +37,7 @@ void exibir_menu() {
     printf("13. Exibir Dados da Unidade\n");
     printf("14. Gerar Notificacoes\n");
     printf("15. Exibir Minhas Notificacoes\n");
+    printf("16. Busca Avancada\n");
     printf("0. Sair\n");
     printf("\nEscolha uma opcao: ");
 }
