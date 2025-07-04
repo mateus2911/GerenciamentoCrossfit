@@ -35,7 +35,8 @@ void exibir_menu() {
     printf("11. Consultar Historico de Aluno\n");
     printf("12. Gerenciar Unidade CrossFit\n");
     printf("13. Exibir Dados da Unidade\n");
-    printf("14. Exibir Minhas Notificacoes\n");
+    printf("14. Gerar Notificacoes\n");
+    printf("15. Exibir Minhas Notificacoes\n");
     printf("0. Sair\n");
     printf("\nEscolha uma opcao: ");
 }
@@ -96,7 +97,10 @@ int main() {
                 break;
             case 12: gerenciar_unidade_crossfit(); break;
             case 13: exibir_dados_unidade(); break;
-            case 14:
+            case 14: verificar_e_gerar_notificacoes();
+                printf("Notificacoes geradas com sucesso.\n");
+                break;
+            case 15:
                 printf("Voce e (1) Aluno ou (2) Coach? ");
                 scanf("%d", &tipo_usuario);
                 printf("Digite seu ID: ");
