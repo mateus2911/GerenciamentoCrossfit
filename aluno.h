@@ -4,7 +4,10 @@
 
 #ifndef ALUNO_H
 #define ALUNO_H
+#ifndef ALUNOCrud_H
+#define ALUNOCrud_H
 
+#include "../models/aluno.h"
 #include "entidades.h"
 
 void cadastrar_aluno();
