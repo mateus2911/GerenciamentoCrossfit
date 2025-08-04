@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "ordenacao.h"
 #include "aluno.h"
+#include <limits.h>
+#define TAMANHO_MEMORIA 100
 
 void ordenar_base_alunos() {
     int total_alunos = obter_total_alunos();
@@ -62,4 +64,5 @@ void ordenar_base_alunos() {
     fclose(file);
 
     printf("\nBase de dados de alunos ordenada com sucesso por ID.\n");
+
 }

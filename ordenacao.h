@@ -4,6 +4,7 @@
 
 #ifndef ORDENACAO_H
 #define ORDENACAO_H
+#include "aluno.h"
 
 void ordenar_base_alunos();
 void ordenar_base_coaches();
