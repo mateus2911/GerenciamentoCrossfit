@@ -187,67 +187,7 @@ int main() {
 
     return 0;
 
-    int op;
-    char nomeDoArquivo[] = "alunos.db";
-
-    do {
-        printf("\nMenu de Opcoes:\n");
-        printf("1 - Adicionar Aluno\n");
-        printf("2 - Listar Alunos\n");
-        printf("3 - Atualizar Aluno\n");
-        printf("4 - Deletar Aluno\n");
-        printf("5 - Testes de Ordenacao (PARTE II)\n");
-        printf("0 - Sair\n");
-        printf("Escolha uma opcao: ");
-        scanf("%d", &op);
-
-        int id;
-        Aluno a;
-
-        switch (op) {
-            case 1:
-                printf("ID: ");
-                scanf("%d", &a.id);
-                printf("Nome: ");
-                scanf(" %[^\n]", a.nome);
-                printf("Email: ");
-                scanf(" %[^\n]", a.email);
-                printf("Senha: ");
-                scanf(" %[^\n]", a.senha);
-                createAluno(nomeDoArquivo, newAluno(a.id, a.nome, a.email, a.senha));
-                break;
-            case 2:
-                readAllAlunos(nomeDoArquivo);
-                break;
-            case 3:
-                printf("ID do aluno a ser atualizado: ");
-                scanf("%d", &id);
-                printf("Novo Nome: ");
-                scanf(" %[^\n]", a.nome);
-                printf("Novo Email: ");
-                scanf(" %[^\n]", a.email);
-                printf("Nova Senha: ");
-                scanf(" %[^\n]", a.senha);
-                a.id = id;
-                updateAluno(nomeDoArquivo, a);
-                break;
-            case 4:
-                printf("ID do aluno a ser deletado: ");
-                scanf("%d", &id);
-                deleteAluno(nomeDoArquivo, id);
-                break;
-            case 5:
-                executar_testes_ordenacao();
-                break;
-            case 0:
-                printf("Saindo...\n");
-                break;
-            default:
-                printf("Opcao invalida!\n");
-        }
-    } while (op != 0);
-
-    return 0;
+    
 
 }
 
