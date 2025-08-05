@@ -1,4 +1,3 @@
-
 //Camille Silva Oliveira 23.1.8120
 //Mateus Rodrigues 19.2.8177
 
@@ -9,6 +8,7 @@
 #include "aluno.h"
 #include "utils.h"
 #include <time.h>
+#include "entidades.h" // Adicionado para ARQUIVO_ALUNOS e struct Aluno
 
 int obter_total_alunos() {
     FILE *file = fopen(ARQUIVO_ALUNOS, "rb");

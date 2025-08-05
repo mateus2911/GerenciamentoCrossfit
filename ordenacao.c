@@ -5,6 +5,7 @@
 #include "ordenacao.h"
 #include "aluno.h"
 #include "utils.h" // Incluído para a função limpar_buffer_entrada()
+#include "entidades.h" // Adicionado para ARQUIVO_ALUNOS
 
 #define TAM_MEMORIA 10 // Define o tamanho da memória principal para a ordenação. Pode ser ajustado.
 #define ARVORE_FILE "arvore_vencedores.bin" // Arquivo temporário para a árvore

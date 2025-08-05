@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "aluno.h"
+#include "entidades.h" // Adicionado para struct Aluno
 
 // Estrutura do nó para a árvore de vencedores, usando Aluno.
 typedef struct No {

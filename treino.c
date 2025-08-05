@@ -8,6 +8,7 @@
 #include "aluno.h"
 #include "coach.h" // Incluir o cabeçalho do coach
 #include "utils.h"
+#include "entidades.h" // Adicionado para ARQUIVO_TREINOS e outras macros
 
 int obter_total_treinos() {
     FILE *file = fopen(ARQUIVO_TREINOS, "rb");

@@ -75,7 +75,7 @@ void menu_busca_avancada() {
             case 1: consultar_treinos_por_tipo(); break;
             case 2: consultar_treinos_por_data(); break;
             case 3: consultar_alunos_por_nivel(); break;
-            case 4: consultar_alunos_por_frequencia(); break;
+            //case 4: consultar_alunos_por_frequencia(); break;
             case 5: consultar_coaches_por_carga_horaria(); break;
             case 0: break; // Volta ao menu principal
             default: printf("Opcao invalida! Tente novamente.\n"); break;
@@ -98,8 +98,6 @@ void criar_base_de_dados_teste(const char* nome_arquivo, int num_registros) {
         Aluno a;
         a.id = rand() % (num_registros * 10);
         sprintf(a.nome, "Aluno Teste %d", i);
-        sprintf(a.email, "teste%d@email.com", i);
-        sprintf(a.senha, "senha%d", i);
         fwrite(&a, sizeof(Aluno), 1, f);
     }
     fclose(f);
