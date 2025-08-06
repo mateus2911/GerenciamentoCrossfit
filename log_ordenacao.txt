@@ -1,1 +1,4 @@
 [2025-08-05 22:51:48] Metodo: Ordenacao Externa, Alunos: 50, Tempo: 0,028000 segundos
+
+[2025-08-06 09:54:45] Metodo: Bubble Sort, Alunos: 1000, Tempo: 1,299000 segundos
+[2025-08-06 09:55:00] Metodo: Ordenacao Externa, Alunos: 1000, Tempo: 0,152000 segundos
