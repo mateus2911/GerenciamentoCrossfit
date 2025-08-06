@@ -2,13 +2,34 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 #include "ordenacao.h"
 #include "aluno.h"
 #include "utils.h" // Incluído para a função limpar_buffer_entrada()
 #include "entidades.h" // Adicionado para ARQUIVO_ALUNOS
 
+#define LOG_ORDENACAO_FILE "log_ordenacao.txt"
 #define TAM_MEMORIA 10 // Define o tamanho da memória principal para a ordenação. Pode ser ajustado.
 #define ARVORE_FILE "arvore_vencedores.bin" // Arquivo temporário para a árvore
+
+// Função para registrar a operação de ordenação em um arquivo de log
+static void registrar_log_ordenacao(const char* metodo, double tempo, int num_alunos) {
+    FILE* log_file = fopen(LOG_ORDENACAO_FILE, "a");
+    if (log_file == NULL) {
+        perror("Erro ao abrir arquivo de log da ordenacao");
+        return;
+    }
+
+    time_t t = time(NULL);
+    struct tm* tm_info = localtime(&t);
+    char timestamp[26];
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
+
+    fprintf(log_file, "[%s] Metodo: %s, Alunos: %d, Tempo: %f segundos\n",
+            timestamp, metodo, num_alunos, tempo);
+
+    fclose(log_file);
+}
 
 // Protótipos de funções auxiliares estáticas (visíveis apenas neste arquivo)
 static char** selecao_com_substituicao(int* numParticoes);
@@ -20,8 +41,17 @@ static void excluir_particoes(const char** arquivos, int numParticoes);
 // Função principal que agora apresenta um menu de escolha
 void ordenar_base_alunos() {
     int opcao;
+    clock_t start, end;
+    double cpu_time_used;
+    int num_alunos = obter_total_alunos(); // Obtém o número de alunos antes de ordenar
+
+    if (num_alunos == 0) {
+        printf("\nNao ha alunos para ordenar.\n");
+        return;
+    }
+
     printf("\n--- Menu de Ordenacao ---\n");
-    printf("Escolha o metodo para ordenar a base de alunos:\n");
+    printf("Escolha o metodo para ordenar a base de alunos (%d registros):\n", num_alunos);
     printf("1. Ordenacao Externa (Selecao por Substituicao + Arvore de Vencedores) - Recomendado\n");
     printf("2. Bubble Sort (Ineficiente para arquivos grandes)\n");
     printf("0. Cancelar\n");
@@ -36,6 +66,7 @@ void ordenar_base_alunos() {
 
     switch (opcao) {
         case 1: {
+            start = clock();
             int numParticoes = 0;
             printf("\nIniciando Ordenacao Externa...\n");
 
@@ -61,11 +92,20 @@ void ordenar_base_alunos() {
             excluir_particoes((const char**)nomesParticoes, numParticoes);
 
             printf("\nOrdenacao Externa concluida com sucesso!\n");
+            end = clock();
+            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+            printf("Tempo de execucao da Ordenacao Externa: %f segundos\n", cpu_time_used);
+            registrar_log_ordenacao("Ordenacao Externa", cpu_time_used, num_alunos);
             break;
         }
         case 2:
             printf("\nIniciando Bubble Sort...\n");
+            start = clock();
             bubble_sort_alunos();
+            end = clock();
+            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+            printf("Tempo de execucao do Bubble Sort: %f segundos\n", cpu_time_used);
+            registrar_log_ordenacao("Bubble Sort", cpu_time_used, num_alunos);
             break;
         case 0:
             printf("Operacao de ordenacao cancelada.\n");

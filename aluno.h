@@ -12,6 +12,7 @@ Aluno buscar_aluno_binaria(int id);
 void listar_alunos();
 int obter_total_alunos();
 void consultar_alunos_por_nivel();
+void embaralhar_base_alunos();
 //void consultar_alunos_por_frequencia();
 
 #endif // ALUNO_H

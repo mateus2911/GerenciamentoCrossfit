@@ -46,6 +46,8 @@ void exibir_menu() {
     printf("14. Gerar Notificacoes\n");
     printf("15. Exibir Minhas Notificacoes\n");
     printf("16. Busca Avancada\n");
+    printf("17. Ordenar Base de Alunos\n");
+    printf("18. Embaralhar Base de Alunos (Teste)\n");
     printf("0. Sair\n");
     printf("\nEscolha uma opcao: ");
 }
@@ -132,8 +134,6 @@ int main() {
             gerar_alunos_aleatorios(quantidade_alunos);
             listar_alunos();
             printf("\nBase de alunos desordenada criada com %d registros.\n", quantidade_alunos);
-            ordenar_base_alunos(); 
-            printf("Base de alunos ordenada com sucesso.\n");
             break;
             case 2: listar_alunos(); break;
             case 3: 
@@ -178,6 +178,8 @@ int main() {
                 }
                 break;
             case 16: menu_busca_avancada(); break; // Adiciona o menu de busca avançada
+            case 17: ordenar_base_alunos(); break;
+            case 18: embaralhar_base_alunos(); break;
             case 0: printf("Saindo do sistema...\n"); break;
             default: printf("Opcao invalida! Tente novamente.\n"); break;
         }

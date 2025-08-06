@@ -149,3 +149,58 @@ void consultar_alunos_por_nivel() {
     }
     fclose(file);
 }
+
+void embaralhar_base_alunos() {
+    FILE *file = fopen(ARQUIVO_ALUNOS, "rb");
+    if (file == NULL) {
+        printf("\nNao foi possivel abrir o arquivo de alunos. A base pode nao existir.\n");
+        return;
+    }
+
+    // Conta o número de alunos
+    fseek(file, 0, SEEK_END);
+    long tamanho_arquivo = ftell(file);
+    int num_alunos = tamanho_arquivo / sizeof(Aluno);
+    rewind(file);
+
+    if (num_alunos <= 1) {
+        printf("\nNao e necessario embaralhar uma base com 1 ou menos alunos.\n");
+        fclose(file);
+        return;
+    }
+
+    // Aloca memória para todos os alunos
+    Aluno *alunos = (Aluno *)malloc(tamanho_arquivo);
+    if (alunos == NULL) {
+        printf("\nErro de alocacao de memoria.\n");
+        fclose(file);
+        return;
+    }
+
+    // Lê todos os alunos para a memória
+    fread(alunos, sizeof(Aluno), num_alunos, file);
+    fclose(file);
+
+    // Embaralha o array de alunos (Algoritmo Fisher-Yates)
+    srand(time(NULL));
+    for (int i = num_alunos - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        Aluno temp = alunos[i];
+        alunos[i] = alunos[j];
+        alunos[j] = temp;
+    }
+
+    // Reescreve o arquivo com os alunos embaralhados
+    file = fopen(ARQUIVO_ALUNOS, "wb");
+    if (file == NULL) {
+        printf("\nNao foi possivel abrir o arquivo para escrita.\n");
+        free(alunos);
+        return;
+    }
+
+    fwrite(alunos, sizeof(Aluno), num_alunos, file);
+    fclose(file);
+    free(alunos);
+
+    printf("\nBase de dados de alunos foi embaralhada com sucesso!\n");
+}
