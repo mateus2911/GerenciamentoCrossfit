@@ -73,6 +73,10 @@ Aluno* buscar_aluno_hash(HashTable* ht, int id) {
         if (no_atual->aluno.id == id && no_atual->aluno.ativo) {
             QueryPerformanceCounter(&end);
             ht->ultimo_tempo_busca.QuadPart = end.QuadPart - start.QuadPart;
+            // Mostra valores debug
+            printf("DEBUG: start=%lld, end=%lld, diff=%lld, freq=%lld\n", 
+                   start.QuadPart, end.QuadPart, 
+                   ht->ultimo_tempo_busca.QuadPart, frequency.QuadPart);
             return &no_atual->aluno; // Retorna o ponteiro para o aluno encontrado
         }
         no_atual = no_atual->proximo;
@@ -80,6 +84,7 @@ Aluno* buscar_aluno_hash(HashTable* ht, int id) {
     
     QueryPerformanceCounter(&end);
     ht->ultimo_tempo_busca.QuadPart = end.QuadPart - start.QuadPart;
+   
     return NULL; // Aluno não encontrado
 }
 

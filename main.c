@@ -149,8 +149,13 @@ int main() {
                     printf("Aluno encontrado: %s\n", aluno_resultado_hash->nome);
                     LARGE_INTEGER frequency;
                     QueryPerformanceFrequency(&frequency);
-                    double tempo_hash = ((double)ht_alunos->ultimo_tempo_busca.QuadPart) / frequency.QuadPart;
-                    printf("Tempo da busca hash: %f segundos.\n", tempo_hash);
+                    
+                    // Calcula o tempo em microssegundos (multiplicando por 1.000.000)
+                    double tempo_hash_micros = ((double)ht_alunos->ultimo_tempo_busca.QuadPart * 1000000.0) / frequency.QuadPart;
+                    
+                    printf("Tempo da busca hash: %.2f microssegundos\n", tempo_hash_micros);
+                    // Também mostre em segundos para comparação
+                    printf("(equivalente a %f segundos)\n", tempo_hash_micros / 1000000.0);
                 } else {
                     printf("Aluno nao encontrado.\n");
                 }
