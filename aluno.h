@@ -4,9 +4,13 @@
 #ifndef ALUNO_H
 #define ALUNO_H
 
-#include "entidades.h" // Adicionado para que o tipo Aluno seja conhecido
+#include "entidades.h" // Para a definição de Aluno
 
-void cadastrar_aluno();
+// Forward declaration para evitar dependência circular
+struct HashTable;
+
+// Protótipos de funções
+void cadastrar_aluno(struct HashTable* ht);
 Aluno buscar_aluno_sequencial(int id);
 Aluno buscar_aluno_binaria(int id);
 void listar_alunos();

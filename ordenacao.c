@@ -3,14 +3,15 @@
 #include <string.h>
 #include <limits.h>
 #include <time.h>
+#include <windows.h> // Para funções de tempo de alta precisão
 #include "ordenacao.h"
 #include "aluno.h"
-#include "utils.h" // Incluído para a função limpar_buffer_entrada()
-#include "entidades.h" // Adicionado para ARQUIVO_ALUNOS
+#include "utils.h"
+#include "entidades.h"
 
 #define LOG_ORDENACAO_FILE "log_ordenacao.txt"
-#define TAM_MEMORIA 10 // Define o tamanho da memória principal para a ordenação. Pode ser ajustado.
-#define ARVORE_FILE "arvore_vencedores.bin" // Arquivo temporário para a árvore
+#define TAM_MEMORIA 10
+#define ARVORE_FILE "arvore_vencedores.bin"
 
 // Função para registrar a operação de ordenação em um arquivo de log
 static void registrar_log_ordenacao(const char* metodo, double tempo, int num_alunos) {
@@ -31,17 +32,17 @@ static void registrar_log_ordenacao(const char* metodo, double tempo, int num_al
     fclose(log_file);
 }
 
-// Protótipos de funções auxiliares estáticas (visíveis apenas neste arquivo)
+
 static char** selecao_com_substituicao(int* numParticoes);
 static void intercalar_com_arvore_vencedores(const char* arquivos[], int numParticoes);
 static FILE* construir_arvore_vencedores(No* folhas, int n);
 static void atualizar_arvore(FILE* arquivoArvore, int n, int indiceFolha, Aluno novo);
 static void excluir_particoes(const char** arquivos, int numParticoes);
 
-// Função principal que agora apresenta um menu de escolha
+// Função principal menu de escolha
 void ordenar_base_alunos() {
     int opcao;
-    clock_t start, end;
+    LARGE_INTEGER frequency, start, end;
     double cpu_time_used;
     int num_alunos = obter_total_alunos(); // Obtém o número de alunos antes de ordenar
 
@@ -64,9 +65,11 @@ void ordenar_base_alunos() {
     }
     limpar_buffer_entrada();
 
+    QueryPerformanceFrequency(&frequency); // Inicializa a frequência do timer
+
     switch (opcao) {
         case 1: {
-            start = clock();
+            QueryPerformanceCounter(&start);
             int numParticoes = 0;
             printf("\nIniciando Ordenacao Externa...\n");
 
@@ -92,18 +95,18 @@ void ordenar_base_alunos() {
             excluir_particoes((const char**)nomesParticoes, numParticoes);
 
             printf("\nOrdenacao Externa concluida com sucesso!\n");
-            end = clock();
-            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+            QueryPerformanceCounter(&end);
+            cpu_time_used = ((double)(end.QuadPart - start.QuadPart)) / frequency.QuadPart;
             printf("Tempo de execucao da Ordenacao Externa: %f segundos\n", cpu_time_used);
             registrar_log_ordenacao("Ordenacao Externa", cpu_time_used, num_alunos);
             break;
         }
         case 2:
             printf("\nIniciando Bubble Sort...\n");
-            start = clock();
+            QueryPerformanceCounter(&start);
             bubble_sort_alunos();
-            end = clock();
-            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+            QueryPerformanceCounter(&end);
+            cpu_time_used = ((double)(end.QuadPart - start.QuadPart)) / frequency.QuadPart;
             printf("Tempo de execucao do Bubble Sort: %f segundos\n", cpu_time_used);
             registrar_log_ordenacao("Bubble Sort", cpu_time_used, num_alunos);
             break;
@@ -116,8 +119,7 @@ void ordenar_base_alunos() {
     }
 }
 
-// Implementação da Seleção com Substituição para criar as partições ordenadas.
-// (Esta função permanece a mesma da versão anterior)
+// Seleção com Substituição 
 static char** selecao_com_substituicao(int* numParticoes) {
     FILE* arquivoPrincipal = fopen(ARQUIVO_ALUNOS, "rb");
     if (!arquivoPrincipal) {
@@ -220,7 +222,7 @@ static char** selecao_com_substituicao(int* numParticoes) {
 }
 
 
-// --- IMPLEMENTAÇÃO DA ÁRVORE DE VENCEDORES ---
+// ÁRVORE DE VENCEDORES
 
 static FILE* construir_arvore_vencedores(No* folhas, int n) {
     FILE* arquivoArvore = fopen(ARVORE_FILE, "wb+");
@@ -229,7 +231,7 @@ static FILE* construir_arvore_vencedores(No* folhas, int n) {
         return NULL;
     }
 
-    // Escreve os nós folhas (nível mais baixo) na segunda metade do arquivo
+    // Escreve os nós folhas (nível mais baixo) 
     fseek(arquivoArvore, (n - 1) * sizeof(No), SEEK_SET);
     fwrite(folhas, sizeof(No), n, arquivoArvore);
 
@@ -352,7 +354,7 @@ static void intercalar_com_arvore_vencedores(const char* arquivos[], int numPart
     free(folhas);
 }
 
-// --- FIM DA IMPLEMENTAÇÃO DA ÁRVORE DE VENCEDORES ---
+// fim da arvores de vencedores
 
 static void excluir_particoes(const char** arquivos, int numParticoes) {
     for (int i = 0; i < numParticoes; i++) {
@@ -362,7 +364,7 @@ static void excluir_particoes(const char** arquivos, int numParticoes) {
     free(arquivos);
 }
 
-// Implementação do Bubble Sort (sem alterações)
+// Implementação do Bubble Sort
 int bubble_sort_alunos() {
     FILE *f = fopen(ARQUIVO_ALUNOS, "r+b");
     if (!f) {

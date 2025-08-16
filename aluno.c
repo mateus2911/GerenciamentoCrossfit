@@ -8,7 +8,8 @@
 #include "aluno.h"
 #include "utils.h"
 #include <time.h>
-#include "entidades.h" // Adicionado para ARQUIVO_ALUNOS e struct Aluno
+#include "entidades.h"
+#include "hash_aluno.h" // ESSENCIAL: Fornece a definição completa de HashTable
 
 int obter_total_alunos() {
     FILE *file = fopen(ARQUIVO_ALUNOS, "rb");
@@ -20,7 +21,7 @@ int obter_total_alunos() {
 }
 
 // Implementa estrutura para Aluno e cria base de dados desordenada.
-void cadastrar_aluno() {
+void cadastrar_aluno(HashTable* ht) {
     FILE *file = fopen(ARQUIVO_ALUNOS, "ab");
     if (file == NULL) {
         perror("Erro ao abrir o arquivo de alunos");
@@ -28,7 +29,7 @@ void cadastrar_aluno() {
     }
 
     Aluno novo_aluno;
-    novo_aluno.id = obter_total_alunos();
+    novo_aluno.id = obter_total_alunos() + 1; // IDs devem ser únicos e > 0
     novo_aluno.ativo = 1;
 
     printf("Digite o nome do aluno: ");
@@ -39,8 +40,13 @@ void cadastrar_aluno() {
     limpar_buffer_entrada();
     scanf("%[^\n]", novo_aluno.nivel);
 
+    // 1. Salva no arquivo
     fwrite(&novo_aluno, sizeof(Aluno), 1, file);
     fclose(file);
+
+    // 2. Insere na tabela hash em memória
+    inserir_aluno_hash(ht, novo_aluno);
+
     printf("\nAluno com ID %d cadastrado com sucesso!\n", novo_aluno.id);
 }
 

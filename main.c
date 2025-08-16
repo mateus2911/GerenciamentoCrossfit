@@ -5,17 +5,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include "utils.h"
+#include "entidades.h"
 #include "aluno.h"
 #include "coach.h"
 #include "treino.h"
 #include "performance.h"
-#include "ordenacao.h"
 #include "crossfit.h"
-#include "utils.h"
 #include "notificacao.h"
-#include "testes.h"
+#include "ordenacao.h"
+#include "hash_aluno.h" // Essencial para usar a tabela hash
 #include <time.h>
 #include <limits.h>
+#include "testes.h"
 
 #define TAMANHO_MEMORIA 100
 
@@ -32,14 +34,14 @@ void exibir_menu() {
     printf("\n--- Menu Principal ---\n");
     printf("1. Cadastrar Aluno\n");
     printf("2. Listar Alunos\n");
-    printf("3. Buscar Aluno (Sequencial)\n");
-    printf("4. Buscar Aluno (Binaria)\n");
+    printf("3. Buscar Aluno (Tabela Hash)\n");
+    printf("4. Buscar Aluno (Sequencial - Comparativo)\n");
     printf("5. Cadastrar Coach\n");
     printf("6. Listar Coaches\n");
     printf("7. Agendar Treino\n");
     printf("8. Inscrever Aluno em Treino\n");
     printf("9. Listar Treinos\n");
-    printf("10. Registrar Performance\n");
+    printf("10. Registrar Performance de Aluno\n");
     printf("11. Consultar Historico de Aluno\n");
     printf("12. Gerenciar Unidade CrossFit\n");
     printf("13. Exibir Dados da Unidade\n");
@@ -111,10 +113,16 @@ void seuSelectionSort(const char* nomeArquivo);
 
 
 int main() {
-    setlocale(LC_ALL, "Portuguese_Brazil.1252"); // Corrige caracteres especiais
-    int quantidade_alunos = 0;
+    setlocale(LC_ALL, "Portuguese_Brazil.1252");
+
+    // --- Inicialização da Tabela Hash ---
+    HashTable* ht_alunos = criar_hash_table();
+    carregar_alunos_para_hash_table(ht_alunos);
+    // ------------------------------------
+
     int opcao;
-    int id_busca; // Declarada aqui para ser usada em múltiplos cases
+    int id_busca;
+    Aluno* aluno_resultado_hash; // Ponteiro para o resultado da busca hash
     Aluno aluno_resultado; // Variável reutilizável para buscas
     int id_usuario, tipo_usuario;
     inicializar_arquivos();
@@ -129,24 +137,28 @@ int main() {
 
         switch (opcao) {
             case 1: 
-            printf("Quantos alunos deseja criar(para fins de teste)? ");
-            scanf("%d", &quantidade_alunos);
-            gerar_alunos_aleatorios(quantidade_alunos);
-            listar_alunos();
-            printf("\nBase de alunos desordenada criada com %d registros.\n", quantidade_alunos);
-            break;
+                // A função de cadastro precisa ser ajustada para inserir na hash table também
+                cadastrar_aluno(ht_alunos); 
+                break;
             case 2: listar_alunos(); break;
             case 3: 
-                printf("Digite o ID do aluno: ");
+                printf("Digite o ID do aluno (Busca Hash): ");
                 scanf("%d", &id_busca);
-                aluno_resultado = buscar_aluno_sequencial(id_busca);
-                if (aluno_resultado.id != -1) printf("Aluno encontrado: %s\n", aluno_resultado.nome);
-                else printf("Aluno nao encontrado.\n");
+                aluno_resultado_hash = buscar_aluno_hash(ht_alunos, id_busca);
+                if (aluno_resultado_hash != NULL) {
+                    printf("Aluno encontrado: %s\n", aluno_resultado_hash->nome);
+                    LARGE_INTEGER frequency;
+                    QueryPerformanceFrequency(&frequency);
+                    double tempo_hash = ((double)ht_alunos->ultimo_tempo_busca.QuadPart) / frequency.QuadPart;
+                    printf("Tempo da busca hash: %f segundos.\n", tempo_hash);
+                } else {
+                    printf("Aluno nao encontrado.\n");
+                }
                 break;
             case 4: 
-                printf("Digite o ID do aluno: ");
+                printf("Digite o ID do aluno (Busca Sequencial): ");
                 scanf("%d", &id_busca);
-                aluno_resultado = buscar_aluno_binaria(id_busca);
+                aluno_resultado = buscar_aluno_sequencial(id_busca);
                 if (aluno_resultado.id != -1) printf("Aluno encontrado: %s\n", aluno_resultado.nome);
                 else printf("Aluno nao encontrado.\n");
                 break;
@@ -180,14 +192,14 @@ int main() {
             case 16: menu_busca_avancada(); break; // Adiciona o menu de busca avançada
             case 17: ordenar_base_alunos(); break;
             case 18: embaralhar_base_alunos(); break;
-            case 0: printf("Saindo do sistema...\n"); break;
+            case 0: 
+                printf("Saindo do sistema...\n"); 
+                destruir_hash_table(ht_alunos); // Liberar memória da hash table
+                break;
             default: printf("Opcao invalida! Tente novamente.\n"); break;
         }
     } while (opcao != 0);
 
     return 0;
-
-    
-
 }
 
