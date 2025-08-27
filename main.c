@@ -115,11 +115,10 @@ void seuSelectionSort(const char* nomeArquivo);
 int main() {
     setlocale(LC_ALL, "Portuguese_Brazil.1252");
 
-    // --- Inicialização da Tabela Hash ---
+    //Inicialização da Tabela Hash
     HashTable* ht_alunos = criar_hash_table();
     carregar_alunos_para_hash_table(ht_alunos);
-    // ------------------------------------
-
+    
     int opcao;
     int id_busca;
     Aluno* aluno_resultado_hash; // Ponteiro para o resultado da busca hash

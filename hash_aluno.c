@@ -4,7 +4,7 @@
 #include "hash_aluno.h"
 #include "entidades.h"
 
-// Função Hash: Calcula o índice para um determinado ID de aluno
+// Função Hash: Calcula o endereco base para um determinado ID de aluno
 static int hash_function(int id) {
     return id % HASH_TABLE_SIZE;
 }
