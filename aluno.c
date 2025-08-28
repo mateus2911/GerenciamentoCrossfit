@@ -44,7 +44,7 @@ void cadastrar_aluno(HashTable* ht) {
     fwrite(&novo_aluno, sizeof(Aluno), 1, file);
     fclose(file);
 
-    // 2. Insere na tabela hash em memória
+    // 2. Insere na tabela hash em arquivo (memória secundária)
     inserir_aluno_hash(ht, novo_aluno);
 
     printf("\nAluno com ID %d cadastrado com sucesso!\n", novo_aluno.id);

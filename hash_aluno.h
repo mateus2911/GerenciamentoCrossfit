@@ -2,20 +2,21 @@
 #define HASH_ALUNO_H
 
 #include <windows.h> // Para usar LARGE_INTEGER para medições de tempo precisas
+#include <stdio.h>   // Necessário para o tipo FILE
 #include "entidades.h" // Para a definição de Aluno
 
 // Define o tamanho da tabela hash
 #define HASH_TABLE_SIZE 101
 
-// Estrutura do nó da lista encadeada para colisões
+// Estrutura do nó da lista encadeada para colisões (armazenado em arquivo)
 typedef struct HashNode {
     Aluno aluno;
-    struct HashNode* proximo;
+    long proximo; // Offset para o próximo nó no arquivo, -1 se for o último
 } HashNode;
 
-// Estrutura da tabela hash usando LARGE_INTEGER para tempo de alta precisão
+// Estrutura da tabela hash que opera em arquivo
 typedef struct HashTable {
-    HashNode* tabela[HASH_TABLE_SIZE];
+    FILE* arquivo_hash; // Ponteiro para o arquivo que armazena a tabela hash
     LARGE_INTEGER ultimo_tempo_busca; // Usar o tipo do Windows para tempo
 } HashTable;
 
